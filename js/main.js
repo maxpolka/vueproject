@@ -1,17 +1,3 @@
-Vue.component('product-details', {
-    template: `
-    <ul>
-        <li v-for="detail in details">{{ detail }}</li>
-    </ul>
-
-    `,
-    data() {
-        return {
-            details: ['80% cotton', '20% polyester', 'Gender-neutral']
-        }
-    }
-})
-
 Vue.component('product', {
     props: {
         premium: {
@@ -21,7 +7,7 @@ Vue.component('product', {
     },
     template: `
    <div class="product">
-       <div class="product-image">
+    <div class="product-image">
            <img :src="image" :alt="altText"/>
        </div>
 
@@ -29,9 +15,10 @@ Vue.component('product', {
            <h1>{{ title }}</h1>
            <p v-if="inStock">In stock</p>
            <p v-else>Out of Stock</p>
-           <p>Shipping: {{ shipping }}</p>
-           <product-details></product-details>
-
+           <ul>
+               <li v-for="detail in details">{{ detail }}</li>
+           </ul>
+          <p>Shipping: {{ shipping }}</p>
            <div
                    class="color-box"
                    v-for="(variant, index) in variants"
@@ -39,12 +26,6 @@ Vue.component('product', {
                    :style="{ backgroundColor:variant.variantColor }"
                    @mouseover="updateProduct(index)"
            ></div>
-           </div>
-
-           <div class="cart">
-               <p>Cart({{ cart }})</p>
-           </div>
-
            <button
                    v-on:click="addToCart"
                    :disabled="!inStock"
@@ -52,7 +33,16 @@ Vue.component('product', {
            >
                Add to cart
            </button>
+           <button
+                   v-on:click="RemoveFromCart"
+                   :disabled="!inStock"
+                   :class="{ disabledButton: !inStock }"
+           >
+               Remove from cart
+           </button>
+       
        </div>
+   </div>
  `,
     data() {
         return {
@@ -60,6 +50,7 @@ Vue.component('product', {
             brand: 'Vue Mastery',
             selectedVariant: 0,
             altText: "A pair of socks",
+            details: ['80% cotton', '20% polyester', 'Gender-neutral'],
             variants: [
                 {
                     variantId: 2234,
@@ -74,19 +65,22 @@ Vue.component('product', {
                     variantQuantity: 0
                 }
             ],
-            cart: 0,
-
         }
     },
     methods: {
         addToCart() {
-            this.cart += 1
+            this.$emit('add-to-cart',
+            this.variants[this.selectedVariant].variantId);
+        },
+        RemoveFromCart() {
+            this.$emit('remove-from-cart',
+                this.variants[this.selectedVariant].variantId);
         },
         updateProduct(index) {
             this.selectedVariant = index;
             console.log(index);
         }
-    },
+        },
     computed: {
         title() {
             return this.brand + ' ' + this.product;
@@ -106,13 +100,19 @@ Vue.component('product', {
         }
     }
 })
-
 let app = new Vue({
     el: '#app',
     data: {
-        premium: true
+        premium: true,
+        cart: []
+    },
+    methods: {
+        updateCart(id) {
+            this.cart.push(id);
+        },
+        removeCart(id) {
+            this.cart.pop(id);
+        }
     }
+
 })
-
-
-
