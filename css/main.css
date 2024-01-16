@@ -91,3 +91,10 @@ textarea {
 .OutOfStock {
     text-decoration: line-through;
 }
+
+.radiocheck {
+    display:flex;
+    transform: scale(0.8);
+    width:100px;
+    height:30px
+}
