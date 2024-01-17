@@ -103,3 +103,7 @@ textarea {
     display:flex;
     flex-direction:column
 }
+
+.cartcount{
+    width:50px
+}

@@ -105,6 +105,7 @@ Vue.component('product', {
            >
                Add to cart
            </button> 
+           <input id="count" v-model="count" placeholder="count" class="cartcount">
            
        </div>           
        <div>
@@ -124,6 +125,7 @@ Vue.component('product', {
             altText: "A pair of socks",
             details: ['80% cotton', '20% polyester', 'Gender-neutral'],
             price: 2.99,
+            count: 2,
             variants: [
                 {
                     variantId: 2234,
@@ -143,7 +145,9 @@ Vue.component('product', {
     },
     methods: {
         addToCart() {
-            this.$emit('add-to-cart', this.variants[this.selectedVariant].variantId);
+            for (let i = this.count; i > 0; i--) { 
+                this.$emit('add-to-cart', this.variants[this.selectedVariant].variantId);
+            }
             eventBus2.$emit('pricecall', this.price)
         },
         updateProduct(index) {
@@ -184,10 +188,6 @@ Vue.component('product-tabs', {
             type: Array,
             required: false
         },
-        products: {
-            color: 'none',
-            ProductPrice: 0
-        },
     },
     template: `
      <div>   
@@ -225,7 +225,7 @@ Vue.component('product-tabs', {
        </div>
 
      </div>
-
+     </div>
  `,
     data() {
         return {
@@ -238,8 +238,6 @@ Vue.component('product-tabs', {
     methods: {
         PriceSum: function (price) {
             this.fullprice += price;
-            this.products.ProductPrice = price;
-            this.array.push(products);
         },
     },
     mounted: function () {
