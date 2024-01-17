@@ -179,6 +179,16 @@ Vue.component('product', {
 })
 
 Vue.component('product-tabs', {
+    props: {
+        reviews: {
+            type: Array,
+            required: false
+        },
+        products: {
+            color: 'none',
+            ProductPrice: 0
+        },
+    },
     template: `
      <div>   
        <ul>
@@ -192,9 +202,9 @@ Vue.component('product-tabs', {
          <p v-if="!reviews.length">There are no reviews yet.</p>
          <ul>
            <li v-for="review in reviews">
-           <p>{{ review.name }}</p>
-           <p>Rating: {{ review.rating }}</p>
-           <p>{{ review.review }}</p>
+             <p>{{ review.name }}</p>
+             <p>Rating: {{ review.rating }}</p>
+             <p>{{ review.review }}</p>
            </li>
          </ul>
        </div>
@@ -204,30 +214,33 @@ Vue.component('product-tabs', {
        <div v-show="selectedTab === 'Shipping'">
          <span>Delivery price: {{ fullprice }}$</span>
        </div>
-       <div v-show="selectedTab === 'Details'">
-         <span>testing</span>
+       <div class="details" v-show="selectedTab === 'Details'">
+            <div class="product-info">
+           <h3>Vue Mastery Socks</h3>
+           <ul>
+               <li>80% cotton</li>
+               <li>20% polyester</li>
+               <li>Gender-neutral</li>
+         </ul>
        </div>
+
      </div>
 
  `,
-    props: {
-        reviews: {
-            type: Array,
-            required: false
-        }
-    },
     data() {
         return {
             tabs: ['Reviews', 'Make a Review', 'Shipping', 'Details'],
             selectedTab: 'Reviews',  // устанавливается с помощью @click
-            fullprice: 0
+            fullprice: 0,
+
         }
     },
     methods: {
         PriceSum: function (price) {
             this.fullprice += price;
-            console.log("yes")
-        }
+            this.products.ProductPrice = price;
+            this.array.push(products);
+        },
     },
     mounted: function () {
         eventBus2.$on('pricecall', this.PriceSum);

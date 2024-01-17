@@ -98,3 +98,8 @@ textarea {
     width:100px;
     height:30px
 }
+
+.details{
+    display:flex;
+    flex-direction:column
+}
