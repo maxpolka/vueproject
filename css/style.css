@@ -1,0 +1,53 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+}
+
+.column {
+    border: 2px solid #ccc;
+    padding: 10px;
+    width: 400px;
+    min-height: 300px;
+}
+
+.card {
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.list-item {
+    margin-bottom: 5px;
+}
+
+.checkbox {
+    margin-right: 5px;
+}
+
+.completed {
+    text-decoration: line-through;
+    color: #888;
+}
+
+.locked {
+    background-color: #eee;
+    pointer-events: none;
+}
+
+#column_list{
+    display:flex;
+    justify-content: space-between
+}
+
+#app{
+    width:100%
+}
