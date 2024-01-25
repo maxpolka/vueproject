@@ -95,24 +95,37 @@ Vue.component('mainlist', {
         updateCards(column) {
             localStorage.setItem('columnCards', JSON.stringify(this.columnCards));
         },
-        moveCard(payload) {
+        moveCard(payload) {{
             const cardToMove = this.columnCards[payload.fromColumn].splice(payload.cardIndex, 1)[0];
             this.columnCards[payload.toColumn].push(cardToMove);
             this.updateCards(payload.toColumn);
-            if (payload.fromColumn === 'two' && payload.toColumn === 'three') {
-                this.unlockFirstColumn();
-            }
-        },
-        // Блокировка первого столбца
-        lockFirstColumn() {
+            this.updateCards(payload.fromColumn);
+          
+            if (payload.toColumn === 'two' && this.columnCards['two'].length >= 5) {{
+              this.lockFirstColumn();
+            }} else if (payload.fromColumn === 'two' && this.columnCards['two'].length < 5) {{
+              this.unlockFirstColumn();
+            }}
+          }},
+          lockFirstColumn() {{
             this.locked = true;
+            this.columnCards['one'].forEach(card => {{
+              card.checks.forEach(check => {{
+                check.disabled = true;
+              }});
+            }});
             localStorage.setItem('locked', JSON.stringify(this.locked));
-        },
-        // Разблокировка первого столбца
-        unlockFirstColumn() {
+          }},
+          
+          unlockFirstColumn() {{
             this.locked = false;
+            this.columnCards['one'].forEach(card => {{
+              card.checks.forEach(check => {{
+                check.disabled = false;
+              }});
+            }});
             localStorage.setItem('locked', JSON.stringify(this.locked));
-        },
+          }},
         moveToNextColumn(columnName, card) {
             const currentColumnIndex = this.columns.indexOf(columnName);
             const nextColumn = this.columns[currentColumnIndex + 1];
@@ -128,7 +141,6 @@ Vue.component('mainlist', {
         }
     },
     watch: {
-        // Сохранение карточек в localStorage при их изменении
         columnCards: {
             handler() {
                 localStorage.setItem('columnCards', JSON.stringify(this.columnCards));
@@ -146,13 +158,18 @@ Vue.component('card', {
         cards: Array,
         columnCards: Object
     },
+  computed: {
+    isCheckDisabled() {
+      return this.cards[this.cardIndex].checks.length < 3 || (this.column === 'one' && this.$parent.locked);
+    }
+  },
     template: `
       <div>
         <div class="card" v-for="(card, cardIndex) in cards">
           <h3>{{ card.title }}</h3>
           <ul class="list">
             <li class="list-item" v-for="(check, index) in card.checks" :key="index">
-              <input type="checkbox" class="checkbox" :disabled="card.checks[index].disabled" v-model="card.checks[index].enable" @change="checkIfMovable(card, cardIndex)">{{ check.name }}
+            <input type="checkbox" class="checkbox" :disabled="check.disabled" v-model="check.enable" @change="checkIfMovable(card, cardIndex)">{{ check.name }}
             </li>
           </ul>
           <div v-if="card.completedTime">Completed at: {{ card.completedTime }}</div>
@@ -163,13 +180,23 @@ Vue.component('card', {
     `,
     methods: {
         addToCheck(cardIndex) {
-            if (this.cards[cardIndex].checkname && this.cards[cardIndex].checks.length < 5) {
-                this.cards[cardIndex].checks.push({ name: this.cards[cardIndex].checkname, enable: false, disabled: false });
-                this.cards[cardIndex].checkname = '';
-                this.$emit('update-cards', this.column);
+            const card = this.cards[cardIndex];
+            if (card.checkname) {
+              card.checks.push({
+                name: card.checkname,
+                enable: false,
+                disabled: card.checks.length < 2 
+              });
+              card.checkname = '';
+              this.$emit('update-cards', this.column);
+
+              if (card.checks.length >= 3) {
+                card.checks.forEach(check => {
+                  check.disabled = false;
+                });
+              }
             }
-        },
-        // Проверка, можно ли переместить карточку в следующий столбец
+          },
         checkIfMovable(card, cardIndex) {
             const completedChecks = card.checks.filter(check => check.enable).length;
             const totalChecks = card.checks.length;
@@ -222,7 +249,6 @@ let app = new Vue({
         product: "socks"
     },
     methods: {
-        // Перемещение столбца в следующую позици
         moveToNextColumn(column) {
             const index = this.columns.indexOf(column);
             if (index !== -1) {
