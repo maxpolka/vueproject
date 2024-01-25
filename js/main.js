@@ -2,35 +2,35 @@ let eventBus = new Vue();
 
 Vue.component("mainlist", {
     template: `
-    <div class="column_list">
-    <div class="column" v-for="(column, index) in columns" :key="column">
-        <h2>{{ column }}</h2>
-        <card
-          :key="'card-' + column + '-' + cardIndex"
-          :column="column"
-          :cardIndex="cardIndex"
-          :cards="columnCards[column]"
-          :columnCards="columnCards"
-          @update-cards="updateCards"
-          @move-card="moveCard"
-        ></card>
-        <input
-          v-if="column == 'one'"
-          :id="'cardname-' + column"
-          v-model="newCardNames[column]"
-          placeholder="Name for card"
-          class="cardname"
-        >
-        <button
-          v-if="column == 'one'"
-          v-on:click="addToCard(column)"
-        >
-          create
-        </button>
-        <button v-on:click="resetAll" v-if="column == 'one'">clear all</button>
+        <div class="column_list">
+        <div class="column" v-for="(column, index) in columns" :key="column">
+            <h2>{{ column }}</h2>
+            <card
+              :key="'card-' + column + '-' + cardIndex"
+              :column="column"
+              :cardIndex="cardIndex"
+              :cards="columnCards[column]"
+              :columnCards="columnCards"
+              @update-cards="updateCards"
+              @move-card="moveCard"
+            ></card>
+            <input
+              v-if="column == 'one'"
+              :id="'cardname-' + column"
+              v-model="newCardNames[column]"
+              placeholder="Name for card"
+              class="cardname"
+            >
+            <button
+              v-if="column == 'one'"
+              v-on:click="addToCard(column)"
+            >
+              create
+            </button>
+            <button v-on:click="resetAll" v-if="column == 'one'">clear all</button>
+        </div>
     </div>
-</div>
-    `,
+        `,
 
     data() {
         return {
@@ -162,10 +162,22 @@ Vue.component("mainlist", {
                 });
                 localStorage.setItem("locked", JSON.stringify(this.locked));
             }
+
+            // Перемещение карточек, у которых отмечено больше половины чекбоксов, во второй столбец
+            const cardsToMove = this.columnCards["one"].filter((card) => {
+                const completedChecks = card.checks.filter((check) => check.enable).length;
+                const totalChecks = card.checks.length;
+                return completedChecks / totalChecks > 0.5;
+            });
+
+            cardsToMove.forEach((card) => {
+                this.moveToNextColumn("one", card);
+            });
         },
         moveToNextColumn(columnName, card) {
             const currentColumnIndex = this.columns.indexOf(columnName);
             const nextColumn = this.columns[currentColumnIndex + 1];
+
             if (
                 nextColumn &&
                 this.columnCards[nextColumn].length <
@@ -175,11 +187,18 @@ Vue.component("mainlist", {
                     (c) => c !== card
                 );
                 this.columnCards[nextColumn].push(card);
+
                 if (nextColumn === "two" && this.columnCards[nextColumn].length === 5) {
                     this.lockFirstColumn();
                 }
+
                 this.updateCards(columnName);
                 this.updateCards(nextColumn);
+
+                // Проверка, если карточка перемещена во второй столбец и у нее отмечено больше половины чекбоксов
+                if (nextColumn === "two" && card.checks.filter((check) => check.enable).length / card.checks.length > 0.5) {
+                    this.lockFirstColumn();
+                }
             }
         },
     },
@@ -209,20 +228,20 @@ Vue.component("card", {
         },
     },
     template: `
-      <div>
-        <div class="card" v-for="(card, cardIndex) in cards">
-          <h3>{{ card.title }}</h3>
-          <ul class="list">
-            <li class="list-item" v-for="(check, index) in card.checks" :key="index">
-            <input type="checkbox" class="checkbox" :disabled="check.disabled" v-model="check.enable" @change="checkIfMovable(card, cardIndex)">{{ check.name }}
-            </li>
-          </ul>
-          <div v-if="card.completedTime">Completed at: {{ card.completedTime }}</div>
-          <input v-if="column == 'one'" v-model="card.checkname" placeholder="Name for check" class="checkname">
-          <button v-on:click="addToCheck(cardIndex)" v-if="column == 'one'">create</button>
-        </div>
-      </div>
-    `,
+          <div>
+            <div class="card" v-for="(card, cardIndex) in cards">
+              <h3>{{ card.title }}</h3>
+              <ul class="list">
+                <li class="list-item" v-for="(check, index) in card.checks" :key="index">
+                <input type="checkbox" class="checkbox" :disabled="check.disabled" v-model="check.enable" @change="checkIfMovable(card, cardIndex)">{{ check.name }}
+                </li>
+              </ul>
+              <div v-if="card.completedTime">Completed at: {{ card.completedTime }}</div>
+              <input v-if="column == 'one'" v-model="card.checkname" placeholder="Name for check" class="checkname">
+              <button v-on:click="addToCheck(cardIndex)" v-if="column == 'one'">create</button>
+            </div>
+          </div>
+        `,
     methods: {
         addToCheck(cardIndex) {
             const card = this.cards[cardIndex];
