@@ -2,12 +2,19 @@ Vue.component('mainboard', {
     props: ['card', 'columnIndex', 'cardIndex'],
     template: `
         <div class="card"
+             :style="{ 'background-color': card.color }"
              :class="{ 'completed-on-time': card.status === 'Completed on time', 'overdue': card.status === 'Overdue' }">
             <div class="card-title">{{ card.title }}</div>
             <div class="card-date">Created: {{ card.dateCreated }}</div>
             <div class="card-date">Last change: {{ card.lastEdited }}</div>
             <div class="card-description">{{ card.description }}</div>
             <div class="card-deadline" v-if="card.deadline">Deadline: {{ card.deadline }}</div>
+             <label>Color: </label>
+                <select v-model="card.color">
+                    <option value="red">High</option>
+                    <option value="yellow">Middle</option>
+                    <option value="green">Low</option>
+                </select>
             <div class="card-status" v-if='columnIndex === 3'>
                 {{ columnIndex === 3 && currentDate > deadlinefilter ? 'deadline filed' : 'deadline complete' }}
             </div>
@@ -47,7 +54,7 @@ Vue.component('mainboard', {
             editedDescription: this.card.description, 
             editedDeadline: this.card.deadline,
             click: false, 
-            deadlinefilter: new Date(this.card.deadline)
+            deadlinefilter: new Date(this.card.deadline),
         };
     }, computed: {
         currentDate() {
@@ -78,13 +85,13 @@ Vue.component('mainboard', {
             this.$emit('delete-card', this.columnIndex, this.cardIndex);
         },
         moveToInProgress() {
-            this.$emit('move-to-in-progress', this.card, this.columnIndex, this.cardIndex);
+            this.$emit('move-to-in-progress', this.card, this.columnIndex, this.cardIndex, this.card.color);
         },
         moveToTesting() {
-            this.$emit('move-to-testing', this.card, this.columnIndex, this.cardIndex);
+            this.$emit('move-to-testing', this.card, this.columnIndex, this.cardIndex, this.card.color);
         },
         moveToDone() {
-            this.$emit('move-to-done', this.card, this.columnIndex, this.cardIndex);
+            this.$emit('move-to-done', this.card, this.columnIndex, this.cardIndex, this.card.color);
             // moveToCompletedWithColumn()
         },
         returnToInProgress() { //большая функция с процессом
@@ -99,7 +106,8 @@ Vue.component('mainboard', {
                         deadline: this.card.deadline,
                         dateCreated: this.card.dateCreated,
                         lastEdited: new Date().toLocaleString(),
-                        comment: this.card.comment
+                        comment: this.card.comment,
+                        color: originalCard.color
                     });
                 }
 
@@ -122,7 +130,8 @@ Vue.component('mainboard', {
                 dateCreated: this.card.dateCreated,
                 lastEdited: new Date().toLocaleString(),
                 status: this.card.status,
-                comment: this.card.comment
+                comment: this.card.comment,
+                color: originalCard.color
             });
 
             this.$parent.columns[this.columnIndex].cards.splice(this.cardIndex, 1);
@@ -187,7 +196,8 @@ new Vue({
                 deadline: originalCard.deadline,
                 dateCreated: originalCard.dateCreated,
                 lastEdited: originalCard.lastEdited,
-                comment: originalCard.comment
+                comment: originalCard.comment,
+                color: originalCard.color
             });
 
             this.columns[columnIndex].cards.splice(cardIndex, 1);
@@ -201,7 +211,8 @@ new Vue({
                 deadline: originalCard.deadline,
                 dateCreated: originalCard.dateCreated,
                 lastEdited: originalCard.lastEdited,
-                comment: originalCard.comment
+                comment: originalCard.comment,
+                color: originalCard.color
             });
 
             this.columns[columnIndex].cards.splice(cardIndex, 1);
@@ -215,7 +226,8 @@ new Vue({
                 deadline: originalCard.deadline,
                 dateCreated: originalCard.dateCreated,
                 lastEdited: originalCard.lastEdited,
-                comment: originalCard.comment
+                comment: originalCard.comment,
+                color: originalCard.color
             });
             const deadline = new Date(originalCard.deadline);
         },
@@ -232,7 +244,8 @@ new Vue({
                 dateCreated: originalCard.dateCreated,
                 lastEdited: originalCard.lastEdited,
                 status: originalCard.status,
-                comment: originalCard.comment
+                comment: originalCard.comment,
+                color: this.card.color
             });
 
             this.columns[columnIndex].cards.splice(cardIndex, 1);
