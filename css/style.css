@@ -17,10 +17,11 @@ body{
     border: 1px solid #ccc;
     border-radius: 5px;
     padding: 10px;
-    margin: 0 10px;
+    margin: 0 40px;
     background-color: black;
     color:white;
     margin-top: 100px;
+    padding-bottom:80px
 }
 
 .card {

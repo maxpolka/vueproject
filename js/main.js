@@ -1,4 +1,4 @@
-Vue.component('board', {
+Vue.component('mainboard', {
     props: ['card', 'columnIndex', 'cardIndex'],
     template: `
         <div class="card"
@@ -44,9 +44,9 @@ Vue.component('board', {
         return {
             showEditForm: false,
             editedTitle: this.card.title,
-            editedDescription: this.card.description, //Данные для редактирования
+            editedDescription: this.card.description, 
             editedDeadline: this.card.deadline,
-            click: false, //клик для комментария
+            click: false, 
             deadlinefilter: new Date(this.card.deadline)
         };
     }, computed: {
@@ -143,8 +143,8 @@ new Vue({
         newCard: { title: '', description: '', deadline: '', comment: '' }
     },
     computed: {
-        isFormValid() {
-            return this.newCard.title && this.newCard.description && this.newCard.deadline; //проверка карты перед созданием
+        formIsNormal() {
+            return this.newCard.title && this.newCard.description && this.newCard.deadline; 
         },
         canDelete() {
             return this.columnIndex === 0; //удаление для первой колонки
@@ -152,7 +152,7 @@ new Vue({
     },
     methods: {
         addCard(columnIndex) {
-            if (columnIndex === 0 && this.isFormValid) { //создает новую карту
+            if (columnIndex === 0 && this.formIsNormal) { //создает новую карту
                 const newCard = {
                     title: this.newCard.title,
                     description: this.newCard.description,
