@@ -21,7 +21,7 @@ Vue.component('board', {
                 <button v-if="columnIndex === 1" @click="moveToTesting">In testing</button>
                 <button v-if="columnIndex === 2" @click="moveToDone">In completing task</button>
                 <button v-if="columnIndex === 2" @click="onClick">Create reason</button>
-            </div>
+            </div>.
 
             <div v-if="showEditForm" class="edit-form">
                 <label>Tittle: </label><input v-model="editedTitle" />
